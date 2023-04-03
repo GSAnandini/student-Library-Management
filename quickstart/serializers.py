@@ -1,12 +1,21 @@
 from rest_framework import serializers
-from .models import Student
-from .models import Books
-from .models import Library
+from .models import *
+from django.contrib.auth.models import User
 
-class StudentSerializer(serializers.ModelSerializer):
+
+class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
     class Meta:
-        model = Student
-        fields = '__all__'
+        model = User
+        fields = ['email', 'password']
+    def create(self, validated_data):
+        user = User.objects.create(
+            email=validated_data['email'],
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
 
 class BooksSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,3 +26,4 @@ class LibrarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Library
         fields = '__all__'
+
